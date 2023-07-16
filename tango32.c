@@ -434,8 +434,9 @@ tango32_compat_getdents64(struct tango32_compat_getdents64 __user *argp)
 static long tango32_compat_lseek(struct tango32_compat_lseek __user *argp)
 {
 	struct tango32_compat_lseek args;
-	off_t retval;
+	int retval;
 	struct fd f;
+	loff_t offset;
 
 	if (copy_from_user(&args, argp, sizeof(args)))
 		return -EFAULT;
@@ -450,9 +451,20 @@ static long tango32_compat_lseek(struct tango32_compat_lseek __user *argp)
 	set_32bit(true);
 
 	retval = -EINVAL;
-	if (args.whence <= SEEK_MAX)
-		retval = vfs_llseek(f.file, args.offset, args.whence);
+	if (args.whence > SEEK_MAX)
+		goto out_putf;
 
+	offset = vfs_llseek(f.file, args.offset, args.whence);
+
+	retval = (int)offset;
+	if (offset >= 0) {
+		retval = -EFAULT;
+		args.result = offset;
+		if (!copy_to_user(argp, &args, sizeof(args)))
+			retval = 0;
+	}
+
+out_putf:
 	set_32bit(false);
 	my_fdput_pos(f);
 	return retval;

@@ -8,8 +8,8 @@
 
 #define TANGO32_IOCTL_BASE 't'
 
-#define TANGO32_ABI_MAJOR 1
-#define TANGO32_ABI_MINOR 1
+#define TANGO32_ABI_MAJOR 2
+#define TANGO32_ABI_MINOR 0
 
 /*
  * Returns the ABI version for this module.
@@ -94,11 +94,11 @@ struct tango32_compat_robust_list {
  */
 struct tango32_compat_getdents64 {
 	__u32 fd;
-	__u64 dirp;
 	__u32 count;
+	__u64 dirp;
 };
 #define TANGO32_COMPAT_GETDENTS64                                              \
-	_IOR(TANGO32_IOCTL_BASE, 0xa6, struct tango32_compat_getdents64)
+	_IOW(TANGO32_IOCTL_BASE, 0xa6, struct tango32_compat_getdents64)
 
 /*
  * Executes a compat (32-bit) lseek syscall.
@@ -108,10 +108,11 @@ struct tango32_compat_getdents64 {
  */
 struct tango32_compat_lseek {
 	__u32 fd;
-	__u64 offset;
 	__u32 whence;
+	__u64 offset;
+	__u64 result;
 };
 #define TANGO32_COMPAT_LSEEK                                              \
-	_IOR(TANGO32_IOCTL_BASE, 0xa7, struct tango32_compat_lseek)
+	_IOWR(TANGO32_IOCTL_BASE, 0xa7, struct tango32_compat_lseek)
 
 #endif /* TANGO32_H_ */
