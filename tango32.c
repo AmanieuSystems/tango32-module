@@ -253,7 +253,7 @@ static long tango32_compat_ioctl(struct tango32_compat_ioctl __user *argp)
 	 * workaround we pass the ioctls through unmodified if compat_ioctl is
 	 * not provided. This should work for most ioctls.
 	 */
-	else
+	else if (f.file->f_op->unlocked_ioctl)
 		retval = f.file->f_op->unlocked_ioctl(f.file, args.cmd,
 						      args.arg);
 #endif
